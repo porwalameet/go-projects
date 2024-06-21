@@ -56,7 +56,7 @@ func checkDomain(domain string) {
 	// Check DMARC recods for given domain
 	dmarcRecords, err := net.LookupTXT("_dmarc." + domain)
 	if err != nil {
-		log.Panicf("Error retreiving DMARC records: %v\n", err)
+		log.Printf("Error retreiving DMARC records: %v\n", err)
 	}
 
 	for _, record := range dmarcRecords {
