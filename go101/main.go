@@ -8,22 +8,31 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/gorilla/mux"
 	handlers "github.com/porwalameet/go-projects/go101/handlers"
 )
 
 func main() {
 	l := log.New(os.Stdout, "product-api: ", log.LstdFlags)
 
-	// create the handlers
 	// hh := handlers.NewHello(l)
 	// gh := handlers.NewGoodbye(l)
 	ph := handlers.NewProducts(l)
 
-	// crate the new ServeMux and register the handlers
-	sm := http.NewServeMux()
-	// sm.Handle("/", hh)
-	// sm.Handle("/goodbye", gh)
-	sm.Handle("/", ph)
+	// create the new Gorilla Mux.
+	sm := mux.NewRouter()
+
+	// create the handlers
+	getRouter := sm.Methods(http.MethodGet).Subrouter()
+	getRouter.HandleFunc("/", ph.GetProducts)
+
+	putRouter := sm.Methods(http.MethodPut).Subrouter()
+	putRouter.HandleFunc("/{id:[0-9]+}", ph.UpdateProduct)
+	putRouter.Use(ph.MiddlewareProductValidation)
+
+	postRouter := sm.Methods(http.MethodPost).Subrouter()
+	postRouter.HandleFunc("/", ph.AddProduct)
+	postRouter.Use(ph.MiddlewareProductValidation)
 
 	s := &http.Server{
 		Addr:         ":9090",
