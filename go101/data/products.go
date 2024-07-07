@@ -4,15 +4,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"regexp"
 	"time"
+
+	"github.com/go-playground/validator/v10"
 )
 
 type Product struct {
 	ID          int     `json:"id"`
-	Name        string  `json:"name"`
+	Name        string  `json:"name" validate:"required"`
 	Description string  `json:"description"`
-	Price       float32 `json:"price"`
-	SKU         string  `json:"sku"`
+	Price       float32 `json:"price" validate:"gt=0"`
+	SKU         string  `json:"sku" validate:"required,sku"`
 	CreatedOn   string  `json:"-"`
 	UpdatedOn   string  `json:"-"`
 	DeletedOn   string  `json:"-"`
@@ -26,6 +29,22 @@ func (p *Products) ToJSON(w io.Writer) error {
 
 func (p *Product) FromJSON(r io.Reader) error {
 	return json.NewDecoder(r).Decode(p)
+}
+
+func validateSKU(fl validator.FieldLevel) bool {
+	// sku format abc-absd-fdf
+	re := regexp.MustCompile(`[a-z]+-[a-z]+-[a-z]+`)
+	matches := re.FindAllString(fl.Field().String(), -1)
+	if len(matches) != 1 {
+		return false
+	}
+	return true
+}
+
+func (p *Product) Validate() error {
+	validate := validator.New()
+	validate.RegisterValidation("sku", validateSKU)
+	return validate.Struct(p)
 }
 
 func GetProducts() Products {
@@ -77,8 +96,8 @@ var productList = []*Product{
 	},
 	{
 		ID:          2,
-		Name:        "Capuchinno",
-		Description: "Capuchino Coffee",
+		Name:        "Espresso",
+		Description: "Espresso Coffee",
 		Price:       3.0,
 		SKU:         "783",
 		CreatedOn:   time.Now().UTC().String(),
