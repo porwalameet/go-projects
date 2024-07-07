@@ -7,7 +7,7 @@ app:
   address: app
   consuladdress: consul:8500
   serviceid: 0
-  basepath: http://localhost:8080/pwd
+  basepath: http://localhost:8081/pwd
 zap:
   level: 0
   logspath: /logs/

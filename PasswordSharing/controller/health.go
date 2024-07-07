@@ -16,7 +16,7 @@ type healthController struct {
 
 func NewHealthController(healthChecks ...health.HealthCheck) Controller {
 	return &healthController{
-		healthChecks: healthchecks,
+		healthChecks: healthChecks,
 	}
 }
 

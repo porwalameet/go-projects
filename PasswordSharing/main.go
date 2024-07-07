@@ -16,9 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-
 	appLogger := logger.NewLoggerFactory(appConfiguration)
-
 	encoder := helper.NewEncoder(appConfiguration)
 	databaseFactory := database.NewFactory(appConfiguration, appLogger)
 	randomFactory := helper.NewRandomFactory()
